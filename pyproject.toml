@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "sgm-kriging-model-service"
+version = "0.1.0"
+description = ""
+authors = ["Joern Richter <jorn.richt@gmail.com>"]
+license = "Apache-2.0"
+readme = "README.md"
+packages = [{include = "kriging_model_service"}]
+
+[tool.poetry.dependencies]
+python = "3.10.5"
+fastapi = "^0.89.1"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+numpy = "^1.24.1"
+pandas = "^1.5.3"
+rpy2 = "^3.5.7"
+
+
+[tool.poetry.group.dev.dependencies]
+autopep8 = "^2.0.1"
+flake8 = "^6.0.0"
+bump2version = "^1.0.1"
+requests = "^2.28.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
