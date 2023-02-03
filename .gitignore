@@ -186,6 +186,7 @@ pip-log.txt
 .vscode/*
 
 /test.py
+/test.ipynb
 /test_*.*
 
 /setup.cfg
