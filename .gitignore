@@ -184,6 +184,7 @@ pip-log.txt
 .idea/*
 #.python-version
 .vscode/*
+.idea/*
 
 /test.py
 /test.ipynb
