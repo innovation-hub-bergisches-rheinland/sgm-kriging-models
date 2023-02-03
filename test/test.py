@@ -4,15 +4,18 @@ import src.ModelPredictionService as mps
 import src.models.ParameterInput as pi
 import src.models.TargetFunctions as tf
 import numpy as np
+import pandas as pd
 
 class TestModelPredictionService(unittest.TestCase):
     
     rpy2.robjects.r['options'](warn=-1)
     example_input = pi.ParameterInput(clamping_force=100, closing_force=10, closing_speed=150, cooling_time=58, cylinder_temperature=214, dosing_speed=10, holding_pressure=226, holding_pressure_time=6, injection_volume_flow=10, lead_temperature=20, opening_speed=150)
-    model_predictions = mps.ModelPredictionService('test/data/Versuchsdaten_v01_complete.CSV')
+    raw_data = pd.read_csv('test/data/Versuchsdaten_v01_complete.CSV', sep=';', decimal='.').to_dict('list')
+    model_predictions = mps.ModelPredictionService(raw_data)
     
     def test_model_prediction(self):
-        self.assertIsInstance(self.model_predictions, mps.ModelPredictionService)
+        model_predictions = mps.ModelPredictionService(self.raw_data)
+        self.assertIsInstance(model_predictions, mps.ModelPredictionService)
         
     def test_predict_all(self):
         response:tf.TargetFunctions = self.model_predictions.predict_all(self.example_input)

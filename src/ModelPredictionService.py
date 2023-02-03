@@ -1,7 +1,8 @@
 import numpy as np
+import pandas as pd
 import rpy2.robjects as robjects
+from rpy2.robjects import numpy2ri
 from rpy2.robjects import pandas2ri
-from rpy2.robjects.packages import importr
 from models.ParameterInput import ParameterInput
 from models.TargetFunctions import TargetFunctions
 from models.PredictionOutput import CycleTimeOutput
@@ -14,22 +15,18 @@ from models.PredictionInput import MaxWarpageInput
 
 class ModelPredictionService:
 
-    def __init__(self, filename) -> None:
+    def __init__(self, raw_data: dict) -> None:
         r = robjects.r
         source_kriging_r = "./src/Rscripts/kriging.R"
         r.source(source_kriging_r)
-        utils = importr('utils')
-
-        # enable r data.frame to pandas and numpy array conversion
-        pandas2ri.activate()
-        training_data = utils.read_csv(file=filename, header=True, sep=";", dec='.')
-        train_cycle_time = robjects.r["trainCycleTime"]
-        self.modelCycleTime = train_cycle_time(training_data)
-        train_avg_volume_shrinkage = robjects.r["trainAvgVolumeShrinkage"]
-        self.modelAvgVolumeShrinkage = train_avg_volume_shrinkage(training_data)
-        train_max_warpage = robjects.r["trainMaxWarpage"]
-        self.modelMaxWarpage = train_max_warpage(training_data)
-        pandas2ri.deactivate
+        
+        training_data = pd.DataFrame(raw_data)
+        with robjects.default_converter + pandas2ri.converter:  
+            training_data = robjects.conversion.get_conversion().py2rpy(training_data)
+        self.modelCycleTime = robjects.r["trainCycleTime"](training_data)
+        self.modelAvgVolumeShrinkage = robjects.r["trainAvgVolumeShrinkage"](training_data)
+        self.modelMaxWarpage = robjects.r["trainMaxWarpage"](training_data)
+        # pandas2ri.deactivate
 
         self.modelPrediction = robjects.r["modelPrediction"]
 
@@ -80,8 +77,7 @@ class ModelPredictionService:
                      vec.holding_pressure_time])
         return self._eval(self.modelMaxWarpage, x)
 
-    def _eval(self, model, x: list) -> float:
-        pandas2ri.activate()
-        y_est = self.modelPrediction(model, np.array(x))
-        pandas2ri.deactivate()
+    def _eval(self, model, x) -> float:
+        with robjects.default_converter + numpy2ri.converter:  
+            y_est = self.modelPrediction(model,x)
         return y_est
