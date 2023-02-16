@@ -1,3 +1,4 @@
+import logging
 import models.PredictionInput as PredictionInput
 import models.PredictionOutput as PredictionOutput
 from fastapi import FastAPI
@@ -10,7 +11,7 @@ from ModelPredictionService import ModelPredictionService, ModelPredictionServic
 
 app = FastAPI()
 model_prediction_service = ModelPredictionService()
-
+logging.basicConfig(level=logging.DEBUG)
 
 app.add_middleware(
     CORSMiddleware,
