@@ -11,11 +11,21 @@ from models.PredictionOutput import MaxWarpageOutput
 from models.PredictionInput import CycleTimeInput
 from models.PredictionInput import AvgVolumeShrinkageInput
 from models.PredictionInput import MaxWarpageInput
+from pydantic import BaseModel
 
+
+
+class ModelPredictionServiceOut(BaseModel):
+    trained: bool
 
 class ModelPredictionService:
-
-    def __init__(self, raw_data: dict) -> None:
+        
+    trained: bool = False    
+    
+    def get_model_prediction_service_out(self)->ModelPredictionServiceOut:
+        return ModelPredictionServiceOut(trained=self.trained)
+    
+    def train(self, raw_data: dict):
         r = robjects.r
         source_kriging_r = "./src/Rscripts/kriging.R"
         r.source(source_kriging_r)
@@ -29,6 +39,8 @@ class ModelPredictionService:
         # pandas2ri.deactivate
 
         self.modelPrediction = robjects.r["modelPrediction"]
+        self.trained = True
+    
 
     def predict_all(self, x: ParameterInput) -> TargetFunctions:
         cycle_time_input = CycleTimeInput(
@@ -43,10 +55,10 @@ class ModelPredictionService:
             holding_pressure_time=x.holding_pressure_time)
 
         return TargetFunctions(
-            cycle_time=self.cycle_time_prediction(cycle_time_input),
+            cycle_time=self.cycle_time_prediction(cycle_time_input).cycle_time,
             avg_volume_shrinkage=self.avg_volume_shrinkage_prediction(
-                avg_volume_shrinkage_input),
-            max_warpage=self.max_warpage_prediction(max_warpage_input)
+                avg_volume_shrinkage_input).avg_volume_shrinkage,
+            max_warpage=self.max_warpage_prediction(max_warpage_input).max_warpage
         )
 
     def cycle_time_prediction(self, vec: CycleTimeInput) -> CycleTimeOutput:
@@ -55,7 +67,7 @@ class ModelPredictionService:
         x2: holding_pressure_time
         """
         x = np.array([vec.cooling_time, vec.holding_pressure_time])
-        return self._eval(self.modelCycleTime, x)
+        return CycleTimeOutput(cycle_time=self._eval(self.modelCycleTime, x))
 
     def avg_volume_shrinkage_prediction(self,
                                         vec: AvgVolumeShrinkageInput) \
@@ -65,7 +77,7 @@ class ModelPredictionService:
         x2: cylinder_temperature
         """
         x = np.array([vec.holding_pressure_time, vec.cylinder_temperature])
-        return self._eval(self.modelAvgVolumeShrinkage, x)
+        return AvgVolumeShrinkageOutput(avg_volume_shrinkage=self._eval(self.modelAvgVolumeShrinkage, x))
 
     def max_warpage_prediction(self, vec: MaxWarpageInput) -> MaxWarpageOutput:
         """
@@ -75,7 +87,7 @@ class ModelPredictionService:
         """
         x = np.array([vec.cooling_time, vec.cylinder_temperature,
                      vec.holding_pressure_time])
-        return self._eval(self.modelMaxWarpage, x)
+        return MaxWarpageOutput(max_warpage=self._eval(self.modelMaxWarpage, x))
 
     def _eval(self, model, x) -> float:
         with robjects.default_converter + numpy2ri.converter:  
