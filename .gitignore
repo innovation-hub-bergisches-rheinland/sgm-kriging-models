@@ -1,5 +1,7 @@
+# Created by https://www.toptal.com/developers/gitignore/api/python
+# Edit at https://www.toptal.com/developers/gitignore?templates=python
 
-
+### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -161,49 +163,11 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-*.pyc
+### Python Patch ###
+# Poetry local configuration file - https://python-poetry.org/docs/configuration/#local-configuration
+poetry.toml
 
-# Packages
-*.egg
-!/tests/**/*.egg
-/*.egg-info
-/dist/*
-build
-_build
-.cache
-*.so
+# ruff
+.ruff_cache/
 
-# Installer logs
-pip-log.txt
-
-# Unit test / coverage reports
-.coverage
-.pytest_cache
-
-.DS_Store
-.idea/*
-#.python-version
-.vscode/*
-.idea/*
-
-/test.py
-/test.ipynb
-/test_*.*
-
-/setup.cfg
-MANIFEST.in
-/setup.py
-/docs/site/*
-/tests/fixtures/simple_project/setup.py
-/tests/fixtures/project_with_extras/setup.py
-.mypy_cache
-
-.venv
-/releases/*
-pip-wheel-metadata
-/poetry.toml
-
-poetry/core/*
-
-# Don't exclude sampledata
-!sampledata/**
+# End of https://www.toptal.com/developers/gitignore/api/python

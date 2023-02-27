@@ -1,0 +1,6 @@
+.venv
+.bumpversion.cfg
+.dockerignore
+.gitignore
+build.sh
+Dockerfile

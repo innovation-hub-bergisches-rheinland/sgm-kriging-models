@@ -1,35 +1,42 @@
+ARG R_VERSION=4.2.2
 
+FROM r-base:${R_VERSION}
 
-FROM python:3.11.2-bullseye as base
+SHELL [ "/bin/bash", "-e", "-u", "-x", "-o", "pipefail", "-c"]
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    r-base \
-    r-base-dev \
-    libcurl4-gnutls-dev \
-    libxml2-dev \
+ARG PYTHON_VERSION=3.11.2
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    cmake \
+    libcurl4-openssl-dev \
     libssl-dev \
-    cmake
+    curl \
+    python3=${PYTHON_VERSION}-* \
+    python3-dev=${PYTHON_VERSION}-* \
+    && rm -rf /var/lib/apt/lists/*
 
-# install r packages
-COPY requirements/requirements.R ./configurations/requirements.R
-RUN Rscript ./configurations/requirements.R
+ENV POETRY_HOME="/opt/poetry"
 
+ARG POETRY_VERSION=1.3.2
 
-# install python packages
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-FROM base
+ENV PATH="$POETRY_HOME/bin:$PATH"
 
-# standard python libs
-COPY requirements/requirements.txt ./configurations/requirements.txt
-RUN pip install -r ./configurations/requirements.txt
+WORKDIR /app
 
-COPY ./src/ /code/src/
-ENV PYTHONPATH="${PYTHONPATH}:/"
+COPY requirements.R ./
 
-WORKDIR /code/
+RUN Rscript requirements.R
 
-RUN ["python", "-m", "unittest"]
+COPY poetry.lock pyproject.toml README.md ./
+COPY sgm_kriging_models/ ./sgm_kriging_models/
+COPY test/ ./test/
 
+RUN poetry config virtualenvs.in-project true \
+    && poetry install
 
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# RUN poetry run python -m unittest
+
+# CMD ["poetry", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]

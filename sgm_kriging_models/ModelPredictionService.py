@@ -19,19 +19,19 @@ class ModelPredictionServiceOut(BaseModel):
     trained: bool
 
 class ModelPredictionService:
-        
-    trained: bool = False    
-    
+
+    trained: bool = False
+
     def get_model_prediction_service_out(self)->ModelPredictionServiceOut:
         return ModelPredictionServiceOut(trained=self.trained)
-    
+
     def train(self, raw_data: dict):
         r = robjects.r
-        source_kriging_r = "./src/Rscripts/kriging.R"
+        source_kriging_r = "./sgm_kriging_models/Rscripts/kriging.R"
         r.source(source_kriging_r)
-        
+
         training_data = pd.DataFrame(raw_data)
-        with robjects.default_converter + pandas2ri.converter:  
+        with robjects.default_converter + pandas2ri.converter:
             training_data = robjects.conversion.get_conversion().py2rpy(training_data)
         self.modelCycleTime = robjects.r["trainCycleTime"](training_data)
         self.modelAvgVolumeShrinkage = robjects.r["trainAvgVolumeShrinkage"](training_data)
@@ -40,7 +40,7 @@ class ModelPredictionService:
 
         self.modelPrediction = robjects.r["modelPrediction"]
         self.trained = True
-    
+
 
     def predict_all(self, x: ParameterInput) -> TargetFunctions:
         cycle_time_input = CycleTimeInput(
@@ -90,6 +90,6 @@ class ModelPredictionService:
         return MaxWarpageOutput(max_warpage=self._eval(self.modelMaxWarpage, x))
 
     def _eval(self, model, x) -> float:
-        with robjects.default_converter + numpy2ri.converter:  
+        with robjects.default_converter + numpy2ri.converter:
             y_est = self.modelPrediction(model,x)
         return y_est
