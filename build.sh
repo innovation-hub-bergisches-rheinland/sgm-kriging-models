@@ -11,11 +11,10 @@ workdir="$(
     pwd
 )"
 
-poetry export --without-hashes -f 'requirements.txt' >"${workdir}/requirements/requirements.txt"
-
 docker build \
     --file "${workdir}/Dockerfile" \
     --tag "${repository}:${version}" \
+    --build-arg 'R_VERSION=4.2.2' \
+    --build-arg "PYTHON_VERSION=$(cat "${workdir}/.python-version")" \
+    --build-arg 'POETRY_VERSION=1.3.2' \
     "${workdir}"
-
-rm --force "${workdir}/requirements/requirements.txt"
