@@ -28,6 +28,11 @@ async def train_model(x: RawData):
     return model_prediction_service.get_model_prediction_service_out()
 
 
+@app.get("/api/training-status", response_model=ModelPredictionServiceOut)
+async def train_model():
+    return model_prediction_service.get_model_prediction_service_out()
+
+
 @app.post("/api/predict-all", response_model=TargetFunctions)
 async def predict_all(x: ParameterInput):
     return model_prediction_service.predict_all(x)
