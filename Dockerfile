@@ -1,6 +1,6 @@
 ARG R_VERSION=4.2.2
 
-FROM rocker/r-ver:${R_VERSION}
+FROM rocker/r-ver:${R_VERSION} AS base
 
 SHELL [ "/bin/bash", "-e", "-u", "-x", "-o", "pipefail", "-c"]
 
@@ -24,6 +24,15 @@ RUN apt-get update \
     python3-dev="${PYTHON_VERSION}-*" \
     && rm -rf /var/lib/apt/lists/*
 
+RUN install2.r --error --skipinstalled --ncpu -1 --deps TRUE \
+    SPOT \
+    && rm -rf /tmp/downloaded_packages \
+    && strip /usr/local/lib/R/site-library/*/libs/*.so
+
+WORKDIR /app
+
+FROM base AS poetry-main
+
 ENV POETRY_HOME="/opt/poetry"
 
 ARG POETRY_VERSION=1.4.0
@@ -32,22 +41,32 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 
 ENV PATH="${POETRY_HOME}/bin:${PATH}"
 
-WORKDIR /app
-
-RUN install2.r --error --skipinstalled --ncpu -1 --deps TRUE \
-    SPOT \
-    && rm -rf /tmp/downloaded_packages \
-    && strip /usr/local/lib/R/site-library/*/libs/*.so
-
 COPY poetry.lock pyproject.toml README.md ./
 COPY sgm_kriging_models/ ./sgm_kriging_models/
-COPY test/ ./test/
 
 RUN poetry config virtualenvs.in-project true \
-    && poetry install
+    && poetry install --only main
 
-RUN poetry run python -m unittest
+FROM poetry-main AS poetry-test
 
-CMD ["poetry", "run", "uvicorn", "sgm_kriging_models.main:app", "--host", "0.0.0.0", "--port", "8080"]
+COPY test/ ./test/
+
+RUN poetry install
+
+FROM base AS test
+
+COPY --from=poetry-test /app ./
+
+ENV PATH=".venv/bin:${PATH}"
+
+RUN python -m unittest
+
+FROM base
+
+COPY --from=poetry-main /app ./
+
+ENV PATH=".venv/bin:${PATH}"
+
+CMD ["uvicorn", "sgm_kriging_models.main:app", "--host", "0.0.0.0", "--port", "8080"]
 
 EXPOSE 8080
