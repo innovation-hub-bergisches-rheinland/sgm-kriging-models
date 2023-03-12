@@ -1,5 +1,7 @@
 # Local Development
+
 Install pyenv with the pyenv installer, configure your shell (log out and log back in for changes to take effect):
+
 ```
 # Install pyenv
 curl https://pyenv.run | bash
@@ -10,20 +12,24 @@ echo 'eval "$(pyenv init --path)"' >> ~/.profile
 echo 'eval "$(pyenv init -)"' >> ~/.bashrc
 echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
 ```
-For install on macos see: https://github.com/pyenv/pyenv
+
+For install on macos see: <https://github.com/pyenv/pyenv>
 
 Install and activate Python version specified in .python-version with pyenv:
+
 ```
 # Install and activate Python version
 pyenv install
 # If the command fails and you are using an Apple Silicon Mac use instead
-arch -arm64 pyenv install           
+arch -arm64 pyenv install
 # Check Python version
 pyenv version
 ```
-Install R on system, see: https://cran.r-project.org/
+
+Install R on system, see: <https://cran.r-project.org/>
 
 Create project environment, install dependencies and activate the environment in your shell:
+
 ```
 # Configure Poetry to create environments in project directories (OPTIONAL)
 poetry config virtualenvs.in-project true
@@ -34,16 +40,20 @@ poetry install
 # Activate project environment
 poetry shell
 ```
-Create environment variables for connection to influxdb if not running on default path ``localhost:8086``:
-```
+
+Create environment variables for connection to influxdb if not running on default path `localhost:8086`:
+
+```bash
 export $INFLUX_HOST=<hostname>
 export $INFLUX_PORT=<port>
 ```
+
 Install R dependencies with `Rscript ./requirements/requirements.R` and R-Python dependencies with `pip install -r ./requirements/requirements.txt`
 
 Run application for dev with: `uvicorn src.main:app --reload`
 
 ## Sample data
+
 For local development it can be necessary to run a influxdb and have some example data in the database.
 InfluxDB have to be run in version 1.8. To run influxdb via docker use the following command: `docker run -p 8086:8086 influxdb:1.8`.
 
