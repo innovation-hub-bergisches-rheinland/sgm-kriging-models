@@ -29,7 +29,7 @@ async def train_model(x: RawData):
 
 
 @app.get("/api/training-status", response_model=ModelPredictionServiceOut)
-async def train_model():
+async def training_status():
     return model_prediction_service.get_model_prediction_service_out()
 
 
