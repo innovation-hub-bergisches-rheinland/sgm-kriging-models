@@ -1,17 +1,20 @@
-name: ci
+name: CI
 
 on:
-  workflow_dispatch
-  # schedule:
-  #   - cron: "0 10 * * *"
-  # push:
-  #   branches:
-  #     - "**"
-  #   tags:
-  #     - "v*.*.*"
-  # pull_request:
-  #   branches:
-  #     - "main"
+  schedule:
+    - cron: "0 10 * * *"
+  push:
+    branches:
+      - "**"
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches:
+      - "main"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 env:
   REGISTRY: quay.io
@@ -54,7 +57,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          push: ${{ github.event_name != 'pull_request' }}
+          # push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest
