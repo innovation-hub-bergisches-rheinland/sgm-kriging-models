@@ -31,7 +31,9 @@ RUN install2.r --error --skipinstalled --ncpu -1 --deps TRUE \
 
 WORKDIR /app
 
-FROM base AS poetry-main
+ENV PATH=".venv/bin:${PATH}"
+
+FROM base AS poetry-base
 
 ENV POETRY_HOME="/opt/poetry"
 
@@ -42,10 +44,15 @@ RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="${POETRY_HOME}/bin:${PATH}"
 
 COPY poetry.lock pyproject.toml README.md ./
-COPY sgm_kriging_models/ ./sgm_kriging_models/
 
 RUN poetry config virtualenvs.in-project true \
-    && poetry install --only main
+    && poetry install --only main --no-root
+
+FROM poetry-base AS poetry-main
+
+COPY sgm_kriging_models/ ./sgm_kriging_models/
+
+RUN poetry install --only main
 
 FROM poetry-main AS poetry-test
 
@@ -57,15 +64,11 @@ FROM base AS test
 
 COPY --from=poetry-test /app ./
 
-ENV PATH=".venv/bin:${PATH}"
-
 RUN python -m unittest
 
 FROM base
 
 COPY --from=poetry-main /app ./
-
-ENV PATH=".venv/bin:${PATH}"
 
 CMD ["uvicorn", "sgm_kriging_models.main:app", "--host", "0.0.0.0", "--port", "8080"]
 
