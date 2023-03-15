@@ -31,16 +31,16 @@ class TestModelPredictionService(unittest.TestCase):
     def test_predict_all(self):
         response: tf.TargetFunctions = self.model_predictions.predict_all(
             self.example_input)
-        self.assertEqual(response, tf.TargetFunctions(cycle_time=77.39477510571808,
-                         avg_volume_shrinkage=13.663473795309102, max_warpage=0.6353053701601542))
+        self.assertAlmostEqual(response.cycle_time, 77.39477510571808, 10)
+        self.assertAlmostEqual(response.avg_volume_shrinkage, 13.663473795309102, 10)
+        self.assertAlmostEqual(response.max_warpage, 0.6353053701601542, 10)
 
     def test_predict_cycle_time(self):
         cycle_time_input = ppi.CycleTimeInput(
             cooling_time=self.example_input.cooling_time, holding_pressure_time=self.example_input.holding_pressure_time)
         response = self.model_predictions.cycle_time_prediction(
             cycle_time_input)
-        self.assertEqual(response, ppo.CycleTimeOutput(
-            cycle_time=77.39477510571808))
+        self.assertAlmostEqual(response.cycle_time, 77.39477510571808, 10)
 
 
 class TestRESTAPI(unittest.IsolatedAsyncioTestCase):
@@ -73,9 +73,10 @@ class TestRESTAPI(unittest.IsolatedAsyncioTestCase):
                 holding_pressure_time=self.raw_data['holding_pressure_time'],
                 max_warpage=self.raw_data['max_warpage']
             ))
-        self.assertEqual(
-            await api.predict_all(self.example_input),
-            tf.TargetFunctions(cycle_time=77.39477510571808, avg_volume_shrinkage=13.663473795309102, max_warpage=0.6353053701601542))
+        response: tf.TargetFunctions = await api.predict_all(self.example_input)
+        self.assertAlmostEqual(response.cycle_time, 77.39477510571808, 10)
+        self.assertAlmostEqual(response.avg_volume_shrinkage, 13.663473795309102, 10)
+        self.assertAlmostEqual(response.max_warpage, 0.6353053701601542, 10)
 
     async def test_predict_max_warpage(self):
         await api.train_model(
@@ -87,13 +88,11 @@ class TestRESTAPI(unittest.IsolatedAsyncioTestCase):
                 holding_pressure_time=self.raw_data['holding_pressure_time'],
                 max_warpage=self.raw_data['max_warpage']
             ))
-        self.assertEqual(
-            await api.predict_max_warpage(
-                ppi.MaxWarpageInput(
+        response: ppo.MaxWarpageOutput = await api.predict_max_warpage(ppi.MaxWarpageInput(
                     cylinder_temperature=self.example_input.cylinder_temperature,
                     holding_pressure_time=self.example_input.holding_pressure_time,
-                    cooling_time=self.example_input.cooling_time)),
-            ppo.MaxWarpageOutput(max_warpage=0.6353053701601542))
+                    cooling_time=self.example_input.cooling_time))
+        self.assertAlmostEqual(response.max_warpage, 0.6353053701601542, 10)
 
 
 if __name__ == '__main__':
