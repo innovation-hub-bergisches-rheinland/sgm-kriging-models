@@ -53,7 +53,8 @@ jobs:
         with:
           context: .
           target: test
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:test-buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:test-buildcache,mode=max
       - name: Build and push
         uses: docker/build-push-action@v4
         with:
@@ -61,5 +62,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest
-          cache-to: type=inline
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.REPOSITORY }}:buildcache,mode=max
