@@ -15,7 +15,7 @@ modelPrediction <- function(modelFit, x) {
 
 trainCycleTime <- function(data) {
     # subselect relevant columns of training data for desired objective
-    x <- as.matrix(subset(data, select = c(cooling_time, holding_pressure_time)))
+    x <- as.matrix(subset(data, select = c(cooling_time, cylinder_temperature, holding_pressure_time, injection_volume_flow)))
     y <- as.matrix(subset(data, select = c(cycle_time)))
     fit <- buildKriging(x = x, y = y, control = ctrl)
     return(fit)
@@ -23,7 +23,7 @@ trainCycleTime <- function(data) {
 
 trainAvgVolumeShrinkage <- function(data) {
     # subselect relevant columns of training data for desired objective
-    x <- as.matrix(subset(data, select = c(holding_pressure_time, cylinder_temperature))) 
+    x <- as.matrix(subset(data, select = c(cooling_time, cylinder_temperature, holding_pressure_time, injection_volume_flow)))
     y <- as.matrix(subset(data, select = c(avg_volume_shrinkage)))
     fit <- buildKriging(x = x, y = y, control = ctrl)
     return(fit)
@@ -31,9 +31,7 @@ trainAvgVolumeShrinkage <- function(data) {
 
 trainMaxWarpage <- function(data) {
     # subselect relevant columns of training data for desired objective
-    x <- as.matrix(subset(data, select = c(cooling_time, 
-                                       cylinder_temperature,
-                                       holding_pressure_time)))
+    x <- as.matrix(subset(data, select = c(cooling_time, cylinder_temperature, holding_pressure_time, injection_volume_flow)))
     y <- as.matrix(subset(data, select = c(max_warpage)))
     fit <- buildKriging(x = x, y = y, control = ctrl)
     return(fit)

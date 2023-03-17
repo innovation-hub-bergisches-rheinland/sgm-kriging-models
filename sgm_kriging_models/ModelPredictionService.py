@@ -8,9 +8,10 @@ from models.TargetFunctions import TargetFunctions
 from models.PredictionOutput import CycleTimeOutput
 from models.PredictionOutput import AvgVolumeShrinkageOutput
 from models.PredictionOutput import MaxWarpageOutput
-from models.PredictionInput import CycleTimeInput
 from models.PredictionInput import AvgVolumeShrinkageInput
+from models.PredictionInput import CycleTimeInput
 from models.PredictionInput import MaxWarpageInput
+from models.PredictionInput import ModelInput
 from pydantic import BaseModel
 
 
@@ -43,23 +44,18 @@ class ModelPredictionService:
         self.trained = True
 
     def predict_all(self, x: ParameterInput) -> TargetFunctions:
-        cycle_time_input = CycleTimeInput(
-            cooling_time=x.cooling_time,
-            holding_pressure_time=x.holding_pressure_time)
-        avg_volume_shrinkage_input = AvgVolumeShrinkageInput(
-            holding_pressure_time=x.holding_pressure_time,
-            cylinder_temperature=x.cylinder_temperature)
-        max_warpage_input = MaxWarpageInput(
+        model_input = ModelInput(
             cooling_time=x.cooling_time,
             cylinder_temperature=x.cylinder_temperature,
-            holding_pressure_time=x.holding_pressure_time)
+            holding_pressure_time=x.holding_pressure_time,
+            injection_volume_flow=x.injection_volume_flow)
 
         return TargetFunctions(
-            cycle_time=self.cycle_time_prediction(cycle_time_input).cycle_time,
+            cycle_time=self.cycle_time_prediction(model_input).cycle_time,
             avg_volume_shrinkage=self.avg_volume_shrinkage_prediction(
-                avg_volume_shrinkage_input).avg_volume_shrinkage,
+                model_input).avg_volume_shrinkage,
             max_warpage=self.max_warpage_prediction(
-                max_warpage_input).max_warpage
+                model_input).max_warpage
         )
 
     def cycle_time_prediction(self, vec: CycleTimeInput) -> CycleTimeOutput:
@@ -67,7 +63,7 @@ class ModelPredictionService:
         x1: cooling_time
         x2: holding_pressure_time
         """
-        x = np.array([vec.cooling_time, vec.holding_pressure_time])
+        x = np.array([vec.cylinder_temperature, vec.cooling_time, vec.holding_pressure_time, vec.injection_volume_flow])
         return CycleTimeOutput(cycle_time=self._eval(self.modelCycleTime, x))
 
     def avg_volume_shrinkage_prediction(self,
@@ -77,7 +73,7 @@ class ModelPredictionService:
         x1: holding_pressure_time
         x2: cylinder_temperature
         """
-        x = np.array([vec.holding_pressure_time, vec.cylinder_temperature])
+        x = np.array([vec.cylinder_temperature, vec.cooling_time, vec.holding_pressure_time, vec.injection_volume_flow])
         return AvgVolumeShrinkageOutput(avg_volume_shrinkage=self._eval(self.modelAvgVolumeShrinkage, x))
 
     def max_warpage_prediction(self, vec: MaxWarpageInput) -> MaxWarpageOutput:
@@ -86,8 +82,7 @@ class ModelPredictionService:
         x2: cylinder_temperature
         x3: holding_pressure_time
         """
-        x = np.array([vec.cooling_time, vec.cylinder_temperature,
-                     vec.holding_pressure_time])
+        x = np.array([vec.cylinder_temperature, vec.cooling_time, vec.holding_pressure_time, vec.injection_volume_flow])
         return MaxWarpageOutput(max_warpage=self._eval(self.modelMaxWarpage, x))
 
     def _eval(self, model, x) -> float:

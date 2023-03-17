@@ -8,5 +8,6 @@ class RawData(BaseModel):
     cycle_time: List[float]
     cylinder_temperature: List[float]
     holding_pressure_time: List[float]
+    injection_volume_flow: List[float]
     max_warpage: List[float]
     
