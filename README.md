@@ -1,3 +1,4 @@
+[![CI](https://github.com/innovation-hub-bergisches-rheinland/sgm-kriging-models/actions/workflows/ci.yaml/badge.svg?branch=main&event=push)](https://github.com/innovation-hub-bergisches-rheinland/sgm-kriging-models/actions/workflows/ci.yaml) [![Release Charts](https://github.com/innovation-hub-bergisches-rheinland/sgm-kriging-models/actions/workflows/release.yaml/badge.svg?branch=main&event=push)](https://github.com/innovation-hub-bergisches-rheinland/sgm-kriging-models/actions/workflows/release.yaml)
 # Local Development
 
 Install pyenv with the pyenv installer, configure your shell (log out and log back in for changes to take effect):
