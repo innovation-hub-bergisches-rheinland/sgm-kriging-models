@@ -56,9 +56,9 @@ RUN poetry install --only main
 
 FROM poetry-main AS poetry-test
 
-COPY test/ ./test/
-
 RUN poetry install
+
+COPY test/ ./test/
 
 FROM base AS test
 
