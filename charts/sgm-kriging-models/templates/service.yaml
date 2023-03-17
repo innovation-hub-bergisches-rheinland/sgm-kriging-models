@@ -2,7 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "sgm-kriging-models.fullname" . }}
-  labels: {{ - include "sgm-kriging-models.labels" . | nindent 4 }}
+  labels:
+    {{- include "sgm-kriging-models.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -10,4 +11,5 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-  selector: {{ - include "sgm-kriging-models.selectorLabels" . | nindent 4 }}
+  selector:
+    {{- include "sgm-kriging-models.selectorLabels" . | nindent 4 }}
