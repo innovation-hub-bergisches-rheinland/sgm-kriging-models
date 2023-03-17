@@ -1,0 +1,14 @@
+apiVersion: v1
+entries:
+  sgm-kriging-models:
+  - apiVersion: v2
+    appVersion: 0.1.1
+    created: "2023-03-17T15:51:58.965950109Z"
+    description: A Helm chart for Kubernetes
+    digest: 98d4d8d5112d7d5f01905c1242f8e4a0f1c76f9ba85548cf9a867a0aa0da0138
+    name: sgm-kriging-models
+    type: application
+    urls:
+    - https://innovation-hub-bergisches-rheinland.github.io/sgm-kriging-models/sgm-kriging-models-0.1.1.tgz
+    version: 0.1.1
+generated: "2023-03-17T15:51:58.965286101Z"
