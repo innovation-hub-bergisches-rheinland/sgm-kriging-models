@@ -9,5 +9,5 @@ class CycleTimeOutput(BaseModel):
     cycle_time: float
 
 
-class AvgVolumeShrinkageOutput(BaseModel):
-    avg_volume_shrinkage: float
+class AvgShrinkageOutput(BaseModel):
+    avg_shrinkage: float

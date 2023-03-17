@@ -11,7 +11,7 @@ class MaxWarpageInput(ModelInput):
     pass
 
 
-class AvgVolumeShrinkageInput(ModelInput):
+class AvgShrinkageInput(ModelInput):
     pass
 
 

@@ -21,10 +21,10 @@ trainCycleTime <- function(data) {
     return(fit)
 }
 
-trainAvgVolumeShrinkage <- function(data) {
+trainAvgShrinkage <- function(data) {
     # subselect relevant columns of training data for desired objective
     x <- as.matrix(subset(data, select = c(cooling_time, cylinder_temperature, holding_pressure_time, injection_volume_flow)))
-    y <- as.matrix(subset(data, select = c(avg_volume_shrinkage)))
+    y <- as.matrix(subset(data, select = c(avg_shrinkage)))
     fit <- buildKriging(x = x, y = y, control = ctrl)
     return(fit)
 }

@@ -43,9 +43,9 @@ async def predict_cycle_time(x: PredictionInput.CycleTimeInput):
     return model_prediction_service.cycle_time_prediction(x)
 
 
-@app.post("/api/predict-avg-volume-shrinkage", response_model=PredictionOutput.AvgVolumeShrinkageOutput)
-async def predict_avg_volume_shrinkage(x: PredictionInput.AvgVolumeShrinkageInput):
-    return model_prediction_service.avg_volume_shrinkage_prediction(x)
+@app.post("/api/predict-avg-shrinkage", response_model=PredictionOutput.AvgShrinkageOutput)
+async def predict_avg_shrinkage(x: PredictionInput.AvgShrinkageInput):
+    return model_prediction_service.avg_shrinkage_prediction(x)
 
 
 @app.post("/api/predict-max-warpage", response_model=PredictionOutput.MaxWarpageOutput)

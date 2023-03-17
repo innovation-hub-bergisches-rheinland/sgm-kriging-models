@@ -40,9 +40,9 @@ class TestModelPredictionService(unittest.TestCase):
     def test_predict_all(self):
         response: tf.TargetFunctions = self.model_predictions.predict_all(
             self.example_input)
-        self.assertAlmostEqual(response.cycle_time, 58.290404007574885, 10)
-        self.assertAlmostEqual(response.avg_volume_shrinkage, 10.310196175894047, 10)
-        self.assertAlmostEqual(response.max_warpage, 0.36341738225264736, 10)
+        self.assertAlmostEqual(response.cycle_time, 58.478251251923396, 10)
+        self.assertAlmostEqual(response.avg_shrinkage, 2.037543087444507, 10)
+        self.assertAlmostEqual(response.max_warpage, 0.3638519462120308, 10)
 
     def test_predict_cycle_time(self):
         cycle_time_input = ppi.CycleTimeInput(
@@ -52,7 +52,7 @@ class TestModelPredictionService(unittest.TestCase):
             injection_volume_flow=self.example_input.injection_volume_flow,)
         response = self.model_predictions.cycle_time_prediction(
             cycle_time_input)
-        self.assertAlmostEqual(response.cycle_time, 58.290404007574885, 10)
+        self.assertAlmostEqual(response.cycle_time, 58.478251251923396, 10)
 
 
 class TestRESTAPI(unittest.IsolatedAsyncioTestCase):
@@ -75,7 +75,7 @@ class TestRESTAPI(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(
             await api.train_model(
                 RawData(
-                    avg_volume_shrinkage=self.raw_data['avg_volume_shrinkage'],
+                    avg_shrinkage=self.raw_data['avg_shrinkage'],
                     cooling_time=self.raw_data['cooling_time'],
                     cycle_time=self.raw_data['cycle_time'],
                     cylinder_temperature=self.raw_data['cylinder_temperature'],
@@ -88,7 +88,7 @@ class TestRESTAPI(unittest.IsolatedAsyncioTestCase):
     async def test_predict_all(self):
         await api.train_model(
             RawData(
-                avg_volume_shrinkage=self.raw_data['avg_volume_shrinkage'],
+                avg_shrinkage=self.raw_data['avg_shrinkage'],
                 cooling_time=self.raw_data['cooling_time'],
                 cycle_time=self.raw_data['cycle_time'],
                 cylinder_temperature=self.raw_data['cylinder_temperature'],
@@ -97,14 +97,14 @@ class TestRESTAPI(unittest.IsolatedAsyncioTestCase):
                 max_warpage=self.raw_data['max_warpage']
             ))
         response: tf.TargetFunctions = await api.predict_all(self.example_input)
-        self.assertAlmostEqual(response.cycle_time, 58.290404007574885, 10)
-        self.assertAlmostEqual(response.avg_volume_shrinkage, 10.310196175894047, 10)
-        self.assertAlmostEqual(response.max_warpage, 0.36341738225264736, 10)
+        self.assertAlmostEqual(response.cycle_time, 58.478251251923396, 10)
+        self.assertAlmostEqual(response.avg_shrinkage, 2.037543087444507, 10)
+        self.assertAlmostEqual(response.max_warpage, 0.3638519462120308, 10)
 
     async def test_predict_max_warpage(self):
         await api.train_model(
             RawData(
-                avg_volume_shrinkage=self.raw_data['avg_volume_shrinkage'],
+                avg_shrinkage=self.raw_data['avg_shrinkage'],
                 cooling_time=self.raw_data['cooling_time'],
                 cycle_time=self.raw_data['cycle_time'],
                 cylinder_temperature=self.raw_data['cylinder_temperature'],
@@ -117,7 +117,7 @@ class TestRESTAPI(unittest.IsolatedAsyncioTestCase):
                     holding_pressure_time=self.example_input.holding_pressure_time,
                     cooling_time=self.example_input.cooling_time,
                     injection_volume_flow=self.example_input.injection_volume_flow))
-        self.assertAlmostEqual(response.max_warpage, 0.36341738225264736, 10)
+        self.assertAlmostEqual(response.max_warpage, 0.3638519462120308, 10)
 
 
 if __name__ == '__main__':
