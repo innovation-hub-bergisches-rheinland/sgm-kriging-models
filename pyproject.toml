@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "sgm-kriging-models"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Joern Richter <jorn.richt@gmail.com>"]
 license = "Apache-2.0"
@@ -9,7 +9,7 @@ packages = [{ include = "sgm_kriging_models" }]
 
 [tool.poetry.dependencies]
 python = "^3.10.6"
-fastapi = "^0.89.1"
+fastapi = "^0.94.1"
 uvicorn = { extras = ["standard"], version = "^0.20.0" }
 numpy = "^1.24.1"
 pandas = "^1.5.3"

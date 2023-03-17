@@ -9,7 +9,7 @@ workdir="$(
 # registry='quay.io'
 # organization='innovation-hub-bergisches-rheinland'
 repository='sgm-kriging-models'
-version='0.1.0'
+version='0.1.1'
 
 r_version='4.2.2'
 python_version="$(cat "${workdir}/.python-version")"
